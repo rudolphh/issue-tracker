@@ -1,7 +1,7 @@
 {
-  "name": "my-hyperdev-app",
+  "name": "issue-tracker",
   "version": "0.0.1",
-  "description": "What am I about?",
+  "description": "All about them project issues",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,6 +11,7 @@
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "cors": "^2.8.1",
+    "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "helmet": "^3.6.1",
     "mocha": "^3.2.0",
