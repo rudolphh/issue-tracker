@@ -60,12 +60,51 @@ module.exports = function (app) {
     .put(function (req, res){
       var project = req.params.project;
 
+      var issue_id = req.body._id;
+      delete req.body._id;
 
+      var issue = req.body;
+
+      for (var field in issue) {
+        if (!issue[field]) { // empty strings false
+          delete issue[field]
+        }
+      }
+
+      if (Object.keys(issue).length === 0) {
+        res.send('no updated field sent');
+      } else {
+        issue.updated_on = new Date();
+        if(req.body.open) issue.open = false;
+
+        MongoClient.connect(CONNECTION_STRING, function(err, db) {
+          var collection = db.collection(project);
+          collection.update(
+            { _id: ObjectId(issue_id) },
+            { $set: issue },
+            { new: true },
+            function(err,doc){
+              !err ? res.send('successfully updated') : res.send('could not update '+issue+' '+err);
+          });
+        });
+      }
     })
 
     .delete(function (req, res){
       var project = req.params.project;
-
+      var issue_id = req.body._id;
+      if (!issue_id) {
+        res.send('_id error');
+      } else {
+        MongoClient.connect(CONNECTION_STRING, function(err, db) {
+          var collection = db.collection(project);
+          collection.findAndRemove(
+            { _id: new ObjectId(issue_id) },
+            function(err,doc){
+            !err ? res.send('deleted '+ issue_id) : res.send('could not delete '+ issue_id + ' ' + err);
+          });
+        });
+      }
     });
 
 };
