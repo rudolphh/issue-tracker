@@ -15,10 +15,8 @@ var ObjectId = require('mongodb').ObjectID;
 const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
 
 function isValidObjectID(str) {
-
   // A valid Object Id must be 24 hex characters
   return (/^[0-9a-fA-F]{24}$/).test(str);
-
 }
 
 module.exports = function (app) {
