@@ -14,6 +14,13 @@ var ObjectId = require('mongodb').ObjectID;
 
 const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
 
+function isValidObjectID(str) {
+
+  // A valid Object Id must be 24 hex characters
+  return (/^[0-9a-fA-F]{24}$/).test(str);
+
+}
+
 module.exports = function (app) {
 
   app.route('/api/issues/:project')
@@ -93,16 +100,21 @@ module.exports = function (app) {
     .delete(function (req, res){
       var project = req.params.project;
       var issue_id = req.body._id;
-      if (!issue_id) {
+      if (!issue_id || !isValidObjectID(issue_id)) {
         res.send('_id error');
       } else {
         MongoClient.connect(CONNECTION_STRING, function(err, db) {
           var collection = db.collection(project);
-          collection.findAndRemove(
-            { _id: new ObjectId(issue_id) },
-            function(err,doc){
-            !err ? res.send('deleted '+ issue_id) : res.send('could not delete '+ issue_id + ' ' + err);
-          });
+          var deleteIssue = collection.find({ _id: new ObjectId(issue_id) }).limit(1);
+          if(deleteIssue.hasNext()){
+            collection.remove({ _id: deleteIssue.next()._id },
+            function(err, doc) {
+              !err ? res.send('deleted '+ issue_id) : res.send('could not delete '+ issue_id + ' ' + err);
+            });
+          } else {
+            res.send('could not delete '+ issue_id + ' ' + ', _id not found');
+          }
+
         });
       }
     });

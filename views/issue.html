@@ -91,6 +91,7 @@
           });
           e.preventDefault();
         });
+        
         $('#issueDisplay').on('click','.deleteIssue', function(e) {
           var url = "/api/issues/"+currentProject;
           $.ajax({
