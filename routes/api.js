@@ -105,16 +105,14 @@ module.exports = function (app) {
       } else {
         MongoClient.connect(CONNECTION_STRING, function(err, db) {
           var collection = db.collection(project);
-          var deleteIssue = collection.find({ _id: new ObjectId(issue_id) }).limit(1);
-          if(deleteIssue.hasNext()){
-            collection.remove({ _id: deleteIssue.next()._id },
+          collection.findOneAndDelete(
+            { _id: new ObjectId(issue_id) },
             function(err, doc) {
-              !err ? res.send('deleted '+ issue_id) : res.send('could not delete '+ issue_id + ' ' + err);
-            });
-          } else {
-            res.send('could not delete '+ issue_id + ' ' + ', _id not found');
-          }
-
+              if(!err){
+                if(doc.value) res.send('deleted '+ issue_id);
+                else res.send('could not delete' + issue_id + ', _id not found');
+              } else res.send('could not delete '+ issue_id + ' ' + err);
+          });
         });
       }
     });
