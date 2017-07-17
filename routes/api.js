@@ -25,9 +25,15 @@ module.exports = function (app) {
 
     .get(function (req, res){
       var project = req.params.project;
+      var query = req.query;
+      if(query._id && isValidObjectID(query._id)) {
+        query._id = new ObjectId(query._id);
+      }
+      if(query.open) { query.open = (query.open == 'true'); }
+    
       MongoClient.connect(CONNECTION_STRING, function(err, db) {
         var collection = db.collection(project);
-        collection.find(req.query).toArray(function(err, docs){
+        collection.find(query).toArray(function(err, docs){
           res.json(docs);
         });
       });
